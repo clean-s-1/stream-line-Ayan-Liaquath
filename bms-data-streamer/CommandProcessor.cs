@@ -37,7 +37,7 @@ namespace bms_data_streamer
 
         private void ExecuteCommand(string command, Action<string> printerAction)
         {
-            _CommandsActionsMap[command]?.Invoke(printerAction);
+            _CommandsActionsMap[command].Invoke(printerAction);
         }
 
         private void ExecuteSenderCommand(Action<string> printerAction)

@@ -1,37 +1,54 @@
 namespace bms_data_streamer
 {
     using System;
-    using System.Collections.Generic;
 
-    public class BmsDataStreamer
+    public class BmsDataStreamer : IBmsDataStreamer
     {
-        private const string CommandPipe = "|";
+        private readonly ICommandProcessor _CommandProcessor;
 
-        static void Main()
+        public BmsDataStreamer(
+            ICommandProcessor commandProcessor)
         {
-            var commandProcessor = new CommandProcessor(
-                new List<ISensor>
-                {
-                    new TemperatureSensor(),
-                    new ChargeRateSensor()
-                },
-                new Sender());
+            _CommandProcessor = commandProcessor;
+        }
 
-            PrintOnConsole("BMS Data Streamer\n\n");
+        public void RunStreamer(Action<string> printerAction, IConsoleReader consoleReader)
+        {
+            if (printerAction == null)
+            {
+                return;
+            }
 
+            printerAction.Invoke("BMS Data Streamer\n\n");
+
+            RunCommandLoop(printerAction, consoleReader);
+        }
+
+        private void RunCommandLoop(Action<string> printerAction, IConsoleReader consoleReader)
+        {
             while (true)
             {
-                PrintOnConsole("Enter command: ");
+                printerAction.Invoke("Press Enter to exit....\nEnter command: ");
 
-                var command = Console.ReadLine();
+                if (GetCommand(consoleReader, out var command))
+                {
+                    break;
+                }
 
-                commandProcessor.ProcessGivenCommand(command, PrintOnConsole);
+                _CommandProcessor.ProcessGivenCommand(command, printerAction);
             }
         }
 
-        private static void PrintOnConsole(string dataToPrint)
+        private bool GetCommand(IConsoleReader consoleReader, out string command)
         {
-            Console.Write(dataToPrint);
+            command = consoleReader?.GetInput();
+
+            if (string.IsNullOrEmpty(command))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
