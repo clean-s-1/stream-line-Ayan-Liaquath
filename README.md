@@ -1,4 +1,4 @@
-#Sender Format
+# Sender Format
 
 "Sensor Name: 50 readings separated by commas + \n\n" and so on.
 Eg: "Temp Sensor: 40,78.9,56.3,.....\n\nCharge Sensor: 0.3,2.3,...\n\n"
